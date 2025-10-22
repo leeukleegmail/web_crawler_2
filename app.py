@@ -1,13 +1,13 @@
 import requests
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
 import threading
-import time
+
+from config import base_url, headers
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Needed for flash messages
 
-headers = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36'
-base_url = 'https://www.girls4cock.com/{}/'
+
 
 def read_from_file():
     with open("people.py") as file:
@@ -95,4 +95,4 @@ def make_request(person):
     return resp
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
