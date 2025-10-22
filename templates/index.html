@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask App - 2 Column Layout</title>
+    <link href="{{ url_for('static',filename='css/style.css') }}" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+    <div class="container">
+        <!-- Left Column -->
+        <div class="column left">
+            <h2>Manage People</h2>
+
+            <form action="/add" method="POST">
+                <input type="text" name="add_item" placeholder="Add person" required>
+                <button type="submit">Add</button>
+            </form>
+
+            <form action="/remove" method="POST" style="margin-top: 10px;">
+                <input type="text" name="remove_item" placeholder="Remove person" required>
+                <button type="submit">Remove</button>
+            </form>
+
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <p></p>
+            <table>
+                <thead>
+                    <tr><th>People</th></tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr><td>{{ item }}</td></tr>
+                    {% else %}
+                        <tr><td colspan="2"><i>No items in the list.</i></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Right Column -->
+        <div class="column">
+            <h2>Check Online</h2>
+            <button onclick="startTask()">Start Check</button>
+
+            <div id="spinner" style="display: none; margin-top: 10px;">
+                <img src="{{ url_for('static', filename='spinner.gif') }}" class="loading" alt="Loading...">
+            </div>
+
+            <ul id="taskResult" style="margin-top: 10px;"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Flash message auto-hide
+        setTimeout(() => {
+            document.querySelectorAll('.message').forEach(el => {
+                el.style.display = 'none';
+            });
+        }, 3000);
+
+        // Start long-running task
+        function startTask() {
+            fetch("/start-task", { method: "POST" });
+            checkTaskStatus();
+        }
+
+        // Poll for task result
+        function checkTaskStatus() {
+            const spinner = document.getElementById("spinner");
+            const resultList = document.getElementById("taskResult");
+            spinner.style.display = "block";
+            resultList.innerHTML = "";
+
+            const interval = setInterval(() => {
+                fetch("/task-status")
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.running) {
+                            spinner.style.display = "none";
+                            resultList.innerHTML = data.result.map(item => `<li>${item}</li>`).join('');
+                            clearInterval(interval);
+                        }
+                    });
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
