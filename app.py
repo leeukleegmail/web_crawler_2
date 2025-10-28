@@ -73,10 +73,6 @@ def long_running_task():
     print(task_results)
     task_running = False
 
-    # time.sleep(5)  # Simulate heavy computation
-    # task_results = [f"Result {i}" for i in range(1, 6)]
-    # task_running = False
-
 
 @app.route('/start_task', methods=['POST'])
 def start_task():
@@ -95,11 +91,13 @@ def task_status():
         'results': task_results
     })
 
+
 def write_to_file():
     with open("people.py", 'w') as f:
         for s in items:
             f.write(s + '\n')
         f.close()
+
 
 def make_request(person):
     person = person.rstrip('\n')
@@ -108,7 +106,7 @@ def make_request(person):
     session.headers['User-Agent'] = headers
     url = base_url.format(person + "/?")
     resp = session.get(url)
-    print(resp.content)
+    logging.info(f"Resp for {person} is {resp.content}")
     return resp
 
 if __name__ == '__main__':
