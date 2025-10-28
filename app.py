@@ -56,7 +56,6 @@ def long_running_task():
     task_running = True
     task_results.clear()
 
-    online_list = []
 
     for person in sorted(items):
         resp = make_request(person)
@@ -65,10 +64,10 @@ def long_running_task():
         logging.info(f"Count for {person} is {online_count}")
 
         if online_count == 5:
-            online_list.append(base_url.format(person))
-        task_results = online_list
+            task_results.append(base_url.format(person))
+        # task_results = [base_url.format("queen_kitty1818"), base_url.format("kaeliascorch")]
 
-    if len(online_list) == 0:
+    if len(task_results) == 0:
         task_results = ["all offline"]
     print(task_results)
     task_running = False
@@ -106,7 +105,7 @@ def make_request(person):
     session.headers['User-Agent'] = headers
     url = base_url.format(person + "/?")
     resp = session.get(url)
-    logging.info(f"Resp for {person} is {resp.content}")
+    # logging.info(f"Resp for {person} is {resp.content}")
     return resp
 
 if __name__ == '__main__':
