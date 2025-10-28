@@ -1,81 +1,98 @@
-import requests
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
-import threading
+import logging
 
-from config import base_url, headers
+import requests
+from flask import Flask, render_template, request, jsonify
+import threading
+import time
+
+from config import headers, base_url
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"  # Needed for flash messages
 
+logging.basicConfig(level=logging.DEBUG)
 
 
 def read_from_file():
     with open("people.py") as file:
         return [line.rstrip() for line in file]
 
+# Shared state
 items = read_from_file()
-
-task_result = []
+task_results = []
 task_running = False
 
-def long_running_task():
-    global task_result, task_running
-    # time.sleep(5)  # Simulate time-consuming work
-    # task_result = [f"Processed item {i}" for i in range(1, 6)]
 
+@app.route('/')
+def index():
+    return render_template('index.html', items=items, task_results=task_results, task_running=task_running)
+
+
+@app.route('/add', methods=['POST'])
+def add_item():
+    item = request.form.get('add_item')
+    if item:
+        items.append(item)
+        msg = f'Added "{item}" to list.'
+    else:
+        msg = 'No item provided.'
+    write_to_file()
+    return jsonify({'success': True, 'message': msg})
+
+
+@app.route('/remove', methods=['POST'])
+def remove_item():
+    item = request.form.get('remove_item')
+    if item in items:
+        items.remove(item)
+        msg = f'Removed "{item}" from list.'
+    else:
+        msg = f'"{item}" not found in list.'
+    write_to_file()
+    return jsonify({'success': True, 'message': msg})
+
+
+def long_running_task():
+    global task_running, task_results
     task_running = True
+    task_results.clear()
 
     online_list = []
+
     for person in sorted(items):
         resp = make_request(person)
 
-        if str(resp.content).count('offline') == 5:
-            online_list.append(person)
-        task_result = online_list
+        online_count = str(resp.content).count('offline')
+        logging.info(f"Count for {person} is {online_count}")
+
+        if online_count == 5:
+            online_list.append(base_url.format(person))
+        task_results = online_list
 
     if len(online_list) == 0:
-        task_result = ["all offline"]
-
+        task_results = ["all offline"]
+    print(task_results)
     task_running = False
 
+    # time.sleep(5)  # Simulate heavy computation
+    # task_results = [f"Result {i}" for i in range(1, 6)]
+    # task_running = False
 
-@app.route("/", methods=["GET"])
-def index():
-    return render_template("index.html", items=items)
 
-@app.route("/add", methods=["POST"])
-def add_item():
-    item = request.form.get("add_item")
-    if item:
-        items.append(item)
-        write_to_file()
-        flash(f"Item '{item}' added successfully!", "add_success")
-    return redirect(url_for("index"))
-
-@app.route("/remove", methods=["POST"])
-def remove_item():
-    item = request.form.get("remove_item")
-    if item in items:
-        items.remove(item)
-        write_to_file()
-        flash(f"Item '{item}' removed successfully!", "remove_success")
-    else:
-        flash(f"Item '{item}' not found in list.", "remove_error")
-    return redirect(url_for("index"))
-
-@app.route("/start-task", methods=["POST"])
+@app.route('/start_task', methods=['POST'])
 def start_task():
     global task_running
     if not task_running:
         thread = threading.Thread(target=long_running_task)
         thread.start()
-    return jsonify({"status": "started"})
+        return jsonify({'started': True})
+    return jsonify({'started': False})
 
-@app.route("/task-status")
+
+@app.route('/task_status')
 def task_status():
     return jsonify({
-        "running": task_running,
-        "result": task_result if not task_running else []
+        'running': task_running,
+        'results': task_results
     })
 
 def write_to_file():
@@ -94,5 +111,5 @@ def make_request(person):
     print(resp.content)
     return resp
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True, port=5001)
