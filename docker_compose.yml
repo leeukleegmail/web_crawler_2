@@ -17,5 +17,5 @@ services:
     volumes:
       - .:/flask_app
     ports:
-      - "5002:5000"
+      - "5009:5000"
     command: ["flask", "run", "--reload"]
