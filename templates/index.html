@@ -2,22 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Flask Two Column Layout</title>
+  <title>Online Web Crawler</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
   <!-- LEFT COLUMN -->
   <div class="column">
-    <h2>Manage Items</h2>
+    <h2>Manage People</h2>
 
     <form id="addForm">
-      <input type="text" name="add_item" placeholder="Add item" required>
+      <input type="text" name="add_item" placeholder="Add People" required>
       <button type="submit">Add</button>
     </form>
 
     <form id="removeForm" style="margin-top:10px;">
-      <input type="text" name="remove_item" placeholder="Remove item" required>
+      <input type="text" name="remove_item" placeholder="Remove People" required>
       <button type="submit">Remove</button>
     </form>
 
@@ -25,7 +25,7 @@
 
     <h3>Current List</h3>
     <table>
-      <tr><th>Item</th></tr>
+      <tr><th>People</th></tr>
       {% for item in items %}
       <tr><td>{{ item }}</td></tr>
       {% endfor %}
@@ -34,8 +34,8 @@
 
   <!-- RIGHT COLUMN -->
   <div class="column">
-    <h2>Long Running Task</h2>
-    <button id="startTaskBtn">Start Task</button>
+    <h2>Online</h2>
+    <button id="startTaskBtn">Start Check</button>
 
     <div id="taskArea">
       {% if task_running %}
