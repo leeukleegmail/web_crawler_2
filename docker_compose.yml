@@ -16,6 +16,7 @@ services:
     working_dir: /flask_app
     volumes:
       - .:/flask_app
+    restart: always
     ports:
       - "5009:5000"
     command: ["flask", "run", "--reload"]
