@@ -1,9 +1,10 @@
 import logging
+from datetime import datetime
 
 import requests
 from flask import Flask, render_template, request, jsonify
 import threading
-import time
+import pytz
 
 from config import headers, base_url
 
@@ -15,6 +16,8 @@ logging.basicConfig(level=logging.DEBUG)
 def read_from_file():
     with open("people.py") as file:
         return [line.rstrip() for line in file]
+
+tz = pytz.timezone('Europe/Amsterdam')
 
 # Shared state
 items = read_from_file()
@@ -65,11 +68,10 @@ def long_running_task():
 
         if online_count == 5:
             task_results.append(base_url.format(person))
-        # task_results = [base_url.format("queen_kitty1818"), base_url.format("kaeliascorch")]
 
     if len(task_results) == 0:
-        from time import gmtime, strftime
-        task_results = [f"all offline, last check at {strftime('%Y-%m-%d %H:%M:%S', gmtime())}"]
+        now = datetime.now(tz)
+        task_results = [f"all offline, last check at {now.strftime('%H:%M:%S')}"]
     print(task_results)
     task_running = False
 
