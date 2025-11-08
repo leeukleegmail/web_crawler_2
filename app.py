@@ -68,7 +68,8 @@ def long_running_task():
         # task_results = [base_url.format("queen_kitty1818"), base_url.format("kaeliascorch")]
 
     if len(task_results) == 0:
-        task_results = ["all offline"]
+        from time import gmtime, strftime
+        task_results = [f"all offline, last check at {strftime('%Y-%m-%d %H:%M:%S', gmtime())}"]
     print(task_results)
     task_running = False
 
