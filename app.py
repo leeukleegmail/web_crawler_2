@@ -70,8 +70,10 @@ def long_running_task():
             task_results.append(base_url.format(person))
 
     if len(task_results) == 0:
-        now = datetime.now(tz)
-        task_results = [f"all offline, last check at {now.strftime('%H:%M:%S')}"]
+        task_results = ["All Offline"]
+
+    now = datetime.now(tz)
+    task_results.append(f"Last run at {now.strftime('%H:%M:%S')}")
     print(task_results)
     task_running = False
 
@@ -108,7 +110,6 @@ def make_request(person):
     session.headers['User-Agent'] = headers
     url = base_url.format(person + "/?")
     resp = session.get(url)
-    # logging.info(f"Resp for {person} is {resp.content}")
     return resp
 
 if __name__ == '__main__':
