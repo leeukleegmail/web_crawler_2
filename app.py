@@ -80,7 +80,6 @@ def add_item():
         # Create new person object
         new_person = {
             'name': name,
-            'description': request.form.get('description', '').strip(),
             'last_seen': None
         }
         items.append(new_person)
@@ -135,11 +134,10 @@ def long_running_task():
             resp = make_request(name)
             online_count = str(resp.content).count('offline')
             logging.info(f"Count for {name} is {online_count}")
-
-            # Update last_seen for every person checked
-            person['last_seen'] = datetime.now(tz).isoformat()
             
             if online_count == 5:
+                # Update last_seen only for people actually online
+                person['last_seen'] = datetime.now(tz).isoformat()
                 task_results.append(base_url.format(name))
         except Exception as e:
             logging.error(f"Error processing {person['name']}: {e}")
@@ -215,4 +213,4 @@ def make_request(person_name):
     return resp
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)

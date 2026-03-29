@@ -1,10 +1,10 @@
 # Online Web Crawler
 
-A Flask web application that monitors the online status of people by scraping a target website. Provides a web interface to manage a list of usernames with descriptions and track when they were last seen online.
+A Flask web application that monitors the online status of people by scraping a target website. Provides a web interface to manage a list of usernames and track when they were last seen online.
 
 ## Features
 
-- ✅ **Web UI** – Manage people (add/remove) with descriptions
+- ✅ **Web UI** – Manage people (add/remove)
 - ✅ **Batch Monitoring** – Trigger background checks to see who's online
 - ✅ **Last Seen Tracking** – Records timestamp when each person was last found online
 - ✅ **Thread-Safe** – Handles concurrent add/remove requests safely
@@ -64,9 +64,8 @@ docker run -d -p 5001:5001 --name web_crawler web_crawler:latest
 ### Web Interface
 
 **Left Column – Manage People:**
-1. Enter name (required) and optional description
-2. Click "Add" to add a person
-3. Enter a name in "Remove" field and click to remove
+1. Enter name (required) and click "Add"
+2. Enter a name in "Remove" field and click to remove
 
 **Right Column – Check Status:**
 1. Click "Start Check" button
@@ -79,7 +78,7 @@ docker run -d -p 5001:5001 --name web_crawler web_crawler:latest
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/` | GET | Render web UI with current list and results |
-| `/add` | POST | Add person (form data: `add_item`, `description`) |
+| `/add` | POST | Add person (form data: `add_item`) |
 | `/remove` | POST | Remove person (form data: `remove_item`) |
 | `/start_task` | POST | Start background monitoring task |
 | `/task_status` | GET | Poll task status and results (JSON) |
@@ -87,8 +86,7 @@ docker run -d -p 5001:5001 --name web_crawler web_crawler:latest
 **Example – Add person via curl:**
 ```bash
 curl -X POST http://localhost:5000/add \
-  -d "add_item=testuser" \
-  -d "description=A test user"
+  -d "add_item=testuser"
 ```
 
 **Example – Check task status:**
@@ -113,20 +111,17 @@ Response:
 
 Each person is an object with:
 - `name` – username/identifier (required)
-- `description` – custom notes/metadata (optional, string)
-- `last_seen` – ISO timestamp when last found online (null if never seen)
+- `last_seen` – ISO timestamp when last found online (null if never checked)
 
 **Example:**
 ```json
 [
   {
     "name": "john_doe",
-    "description": "Friend from school",
     "last_seen": "2026-03-29T14:32:45+01:00"
   },
   {
     "name": "jane_smith",
-    "description": "Work colleague",
     "last_seen": null
   }
 ]
