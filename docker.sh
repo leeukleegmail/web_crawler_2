@@ -1,4 +1,4 @@
-CONTAINER_NAME="web_crawler_2"
+CONTAINER_NAME="web_crawler"
 CONTAINER_PORT="5001"
 
 docker stop $CONTAINER_NAME

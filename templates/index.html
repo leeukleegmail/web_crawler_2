@@ -12,7 +12,8 @@
     <h2>Manage People</h2>
 
     <form id="addForm">
-      <input type="text" name="add_item" placeholder="Add People" required>
+      <input type="text" name="add_item" placeholder="Name" required>
+      <input type="text" name="description" placeholder="Description (optional)">
       <button type="submit">Add</button>
     </form>
 
@@ -25,9 +26,24 @@
 
     <h3>Current List</h3>
     <table>
-      <tr><th>People</th></tr>
+      <tr><th>Name</th><th>Last Seen</th></tr>
       {% for item in items %}
-      <tr><td>{{ item }}</td></tr>
+        {% if item is mapping %}
+          <!-- New JSON format -->
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>
+              {% if item.last_seen_formatted %}
+                {{ item.last_seen_formatted }}
+              {% else %}
+                Not seen
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <!-- Legacy string format -->
+          <tr><td>{{ item }}</td><td>-</td></tr>
+        {% endif %}
       {% endfor %}
     </table>
   </div>

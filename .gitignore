@@ -132,3 +132,10 @@ config.py
 people.py
 
 .idea/
+
+# Project-specific
+.people_*.tmp
+logs/
+*.bak
+*.backup*
+people.py.backup*
